@@ -1,13 +1,19 @@
-
+// msql var represant mysql librare
 const mysql=require("mysql");
-const express=require ("express");
-const body=require("body-parser") ;
+// express var represant express librare
 
+const express =require ("express");
+// body-parser var represant body-parser librare
+
+const body=require("body-parser") ;
+// her  var my_app reqresant my applaction
 var my_app=express();
+// her i told my applacation to use jason and urld encoded
+
 my_app.use(body.json());
 my_app.use(body.urlencoded({extended:true}));
 
-
+//  the info of my data nase
  var mydb= mysql.createPool({
     host:"localhost",
     user:"root",
@@ -16,82 +22,113 @@ my_app.use(body.urlencoded({extended:true}));
     port:8889,
     
  });
+//  alllres to get all restorent info in data bace
+//  req request 
+//  res respons
 my_app.get ("/allres",(req,res)=> {
     var myQuery=`SELECT * FROM Restaurant `;
-mydb.query(myQuery,function(error,users,feld){
+mydb.query(myQuery,
+    // error represant eroor
+    // users represant the anser
+    // feld idont know
+    function(error,users,feld){
 return res.send(users);
 });
 
 });
+//  allmell to get all meall info in data bace
+
 my_app.get ("/allmell",(req,res)=> {
     var myQuery=`SELECT * FROM Meals `;
-mydb.query(myQuery,function(error,users,feld){
-return res.send(users);
+mydb.query(myQuery,function(error,mell,feld){
+return res.send(mell);
 });
 
 });
+// meels/:resto to get the meals of spasifc restorent
 my_app.get ("/meels/:resto",(req,res)=>{
     var myQuery=`SELECT * FROM Meals WHERE Res_N=?`;
     mydb.query(myQuery,req.params.resto,function(error,mels,feld){
         return res.send(mels);
     })
 });
-my_app.listen(4000);
+//add user 
 
-// my_app.post("/adduser",function(req,res){
-//     var data={
-//         // "id":req.body.id,
-//         "NAME":req.body.NAME,
-//         "TYPE":req.body.TYPE,
-//         "TIME_WORK":req.body.TIME_WORK,
-//     };
-//     mydb.query(`INSERT INTO ahmed SET ?`,data,function(error,ans,feld){
-//         if (error ){
-//             res.send({
-//                 "code":500,
-//                 MsG:error
-//             });
+my_app.post("/adduser",function(req,res){
+    var myQuery=`INSERT INTO Userinfo SEt ?`
+    // User_info the data that was send to data bace
+    var User_info={
+        "user_name":req.body.user_name,
+"Nickname":req.body.Nickname,
+"DateOfBirth":req.body.DateOfBirth,
+"Email":req.body.Email,
+"PhonNymber":req.body.PhonNymber,
+"Point":req.body.Point,
+"password":req.body.password,
+    };
+    mydb.query(myQuery,User_info,function(error,anser,feld){
 
-//         }else{
-//             if(error)throw error;ثنث
-//             return  res.send({
-//                 "code":200,
-//                 success:"yes "
-//             });
-//         }
-//     })
-// })
+        if(error){
+            res.send({
+            "code":500,
+            MSG:error
+        })
+        }
+    else{if(error){throw error}
+return res.send({
+    "cood":200,
+    MSG:"good jab"
+})
+}
+});});
+// simple check fo emal and password  by send emali 
+// to data bace to get password and in app we will check the pasword
 
-// my_app.post("/alluser/add",function(req,res){
-// // data that you want to potst in DATA BACE
-// var data={
-//     // "id":req.body.i,
-//     "User_name":req.body.u,
-//     "Password":req.body.p,
-//     "Email":req.body.e3,
-				
-// };
-// var myQuery='INSERT INTO `User_info` SET ?';
-// mydb.query(myQuery,data,function(error,ans,feld){
-    
-// if (error){
-
-//   res.send({
-    
-//     "code":500,
-//     MSG:error,
-// })
-// }
-// else{
-//     if (error) throw error;
-//     else{
-//       return  res.send({
-//             "code":200,
-//             success:"yes "
-//         });
-//     }
-// };
-
-
-// });
-// });
+my_app.get ("/check/:Email/",(req,res)=>{
+    var myQuery=`SELECT  password FROM Userinfo WHERE Email=?`;
+    // Email prameter represant the user emal
+    mydb.query(myQuery,req.params.Email,function(error,anser,feld){
+        if(error){console.log(error)}
+        return res.send(anser);
+    });
+});
+//  singup
+my_app.post("/singup",function(req,res){
+    var myQuery=`INSERT INTO Userinfo SET ?`
+    var User_SingUp={
+        
+ "user_name":req.body.user_name,
+"Email":req.body.Email,
+"PhonNymber":req.body.PhonNymber,
+"password":req.body.password,
+    };
+    mydb.query(myQuery,User_SingUp,function(error,anser,feld){
+        if(error){
+            res.send({
+            "code":500,
+            MSG:error
+        });
+        }
+    else{if(error){throw error}
+return res.send({
+    "cood":200,
+    MSG:"good jab"
+});
+}
+});});
+my_app.get("/GetUserInf/:Email",function(req,res){
+    myQuery=`SELECT * FROM Userinfo WHERE Email=?`;
+    mydb.query(myQuery,req.params.Email,function(error ,info,feld){
+        if(error){console.log(error)}
+        return res.send(info);
+    })
+});
+my_app.get("/offres",function(req,res){
+    var  myQuery=(`SELECT * FROM Offres`);
+    mydb.query(myQuery,function(error,anser,feld){
+        if (error){console.log(error)
+        }
+        return res.send(anser);
+    });
+});
+my_app.listen(4000)
